@@ -1,0 +1,82 @@
+<div class="page">
+  <h1>Jira Integration</h1>
+  <p class="subtitle">Creates real issues in SCRUM and syncs status via webhook.</p>
+
+  <div class="card">
+    <h2>Create ticket</h2>
+
+    <label for="title">Title</label>
+    <input id="title" type="text" [(ngModel)]="title" placeholder="Ticket title" />
+
+    <label for="description">Description</label>
+    <textarea id="description" [(ngModel)]="description" rows="4" placeholder="Description"></textarea>
+
+    <label for="priority">Priority</label>
+    <select id="priority" [(ngModel)]="priority">
+      <option>Low</option>
+      <option>Medium</option>
+      <option>High</option>
+    </select>
+
+    <label for="issueType">Issue type</label>
+    <select id="issueType" [(ngModel)]="issueType">
+      <option>Task</option>
+      <option>Story</option>
+      <option>Bug</option>
+      <option>Epic</option>
+    </select>
+
+    <button type="button" (click)="createTicket()" [disabled]="loading || !title.trim()">
+      {{ loading ? 'Creating...' : 'Create Jira ticket' }}
+    </button>
+
+    @if (errorMessage) {
+      <p class="error">{{ errorMessage }}</p>
+    }
+  </div>
+
+  @if (lastTicket) {
+    <div class="card result-card">
+      <h2>Last created</h2>
+      <p>
+        <strong>Jira key:</strong>
+        <a [href]="jiraBrowseUrl(lastTicket.jiraKey)" target="_blank" rel="noopener noreferrer">
+          {{ lastTicket.jiraKey }}
+        </a>
+      </p>
+      <p><strong>Status:</strong> <span class="badge">{{ lastTicket.status }}</span></p>
+      <p><strong>Title:</strong> {{ lastTicket.title }}</p>
+      <p><strong>Priority:</strong> {{ lastTicket.priority }}</p>
+
+      <button type="button" (click)="refreshTicket()">Refresh from Jira</button>
+      <p class="hint"></p>
+    </div>
+  }
+
+  <div class="card">
+    <div class="list-header">
+      <h2>Tickets in database</h2>
+      <button type="button" (click)="loadTickets()" [disabled]="listLoading">
+        {{ listLoading ? 'Loading...' : 'Reload list' }}
+      </button>
+    </div>
+
+    @if (tickets.length === 0 && !listLoading) {
+      <p class="hint">No tickets yet. Create one above or receive a Jira webhook.</p>
+    }
+
+    @if (tickets.length > 0) {
+      <ul class="ticket-list">
+        @for (ticket of tickets; track ticket.id) {
+          <li>
+            <button type="button" class="ticket-row" (click)="selectTicket(ticket)">
+              <span class="key">{{ ticket.jiraKey }}</span>
+              <span class="status badge">{{ ticket.status }}</span>
+              <span class="title">{{ ticket.title }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>

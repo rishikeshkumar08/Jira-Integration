@@ -1,0 +1,93 @@
+.page {
+  max-width: 640px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.subtitle {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-top: 0.75rem;
+  font-weight: 600;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+}
+
+.badge {
+  background: #e8f4fc;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.error {
+  color: #c00;
+}
+
+.hint {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.ticket-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.ticket-row {
+  width: 100%;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 6rem 1fr 2fr;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.5rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.ticket-row .key {
+  font-weight: 700;
+}
+
+.result-card a {
+  color: #0052cc;
+}

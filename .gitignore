@@ -1,0 +1,17 @@
+# .NET
+**/bin/
+**/obj/
+
+# Node / Angular
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Secrets (use appsettings.example.json in repo instead)
+**/appsettings.Development.json
+**/appsettings.json
+
+# OS / IDE
+.DS_Store
+*.user
+*.suo

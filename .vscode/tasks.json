@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-poc-api",
+      "command": "/opt/homebrew/opt/dotnet@8/bin/dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Api/Api.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET 8 Debug POC Api",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-poc-api",
+      "program": "${workspaceFolder}/Api/bin/Debug/net8.0/Api.dll",
+      "cwd": "${workspaceFolder}/Api",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "DOTNET_ROOT": "/opt/homebrew/opt/dotnet@8/libexec",
+        "PATH": "/opt/homebrew/opt/dotnet@8/libexec:/opt/homebrew/bin:${env:PATH}",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  ]
+}
