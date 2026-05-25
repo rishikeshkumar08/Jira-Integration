@@ -1,9 +1,44 @@
 <div class="page">
   <h1>Jira Integration</h1>
-  <p class="subtitle">Creates real issues in SCRUM and syncs status via webhook.</p>
+  <p class="subtitle">Create issues in any project and sprint. Status syncs via webhook.</p>
 
   <div class="card">
     <h2>Create ticket</h2>
+
+    <label for="project">Project</label>
+    <select id="project" [(ngModel)]="selectedProjectKey" (ngModelChange)="onProjectChange()" [disabled]="projectsLoading">
+      @if (projectsLoading) {
+        <option value="">Loading projects...</option>
+      }
+      @for (project of projects; track project.key) {
+        <option [value]="project.key">{{ project.name }} ({{ project.key }})</option>
+      }
+      @if (!projectsLoading && projects.length === 0) {
+        <option value="">No projects found</option>
+      }
+    </select>
+
+    <label for="sprint">Sprint</label>
+    <select id="sprint" [(ngModel)]="selectedSprintId" [disabled]="sprintsLoading">
+      <option [ngValue]="null">None — goes to Backlog</option>
+      @if (sprintsLoading) {
+        <option value="">Loading sprints...</option>
+      }
+      @for (sprint of sprints; track sprint.id) {
+        <option [ngValue]="sprint.id">{{ sprintLabel(sprint) }}</option>
+      }
+      @if (!sprintsLoading && sprints.length === 0 && selectedProjectKey) {
+        <option value="" disabled>No active/future sprints</option>
+      }
+    </select>
+
+    <label for="issueType">Issue type</label>
+    <select id="issueType" [(ngModel)]="issueType">
+      <option>Task</option>
+      <option>Story</option>
+      <option>Bug</option>
+      <option>Epic</option>
+    </select>
 
     <label for="title">Title</label>
     <input id="title" type="text" [(ngModel)]="title" placeholder="Ticket title" />
@@ -18,15 +53,7 @@
       <option>High</option>
     </select>
 
-    <label for="issueType">Issue type</label>
-    <select id="issueType" [(ngModel)]="issueType">
-      <option>Task</option>
-      <option>Story</option>
-      <option>Bug</option>
-      <option>Epic</option>
-    </select>
-
-    <button type="button" (click)="createTicket()" [disabled]="loading || !title.trim()">
+    <button type="button" (click)="createTicket()" [disabled]="loading || !title.trim() || !selectedProjectKey">
       {{ loading ? 'Creating...' : 'Create Jira ticket' }}
     </button>
 
@@ -49,7 +76,7 @@
       <p><strong>Priority:</strong> {{ lastTicket.priority }}</p>
 
       <button type="button" (click)="refreshTicket()">Refresh from Jira</button>
-      <p class="hint"></p>
+      <p class="hint">Change status in Jira, then refresh (or wait for webhook).</p>
     </div>
   }
 

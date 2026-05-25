@@ -4,7 +4,9 @@ import { FormsModule } from '@angular/forms';
 import {
   CreateJiraIssueRequest,
   JiraPocService,
-  JiraPocTicket
+  JiraPocTicket,
+  JiraProject,
+  JiraSprint
 } from '../../jira-poc.service';
 import { environment } from 'src/environments/environment';
 
@@ -19,11 +21,21 @@ export class JiraPocComponent implements OnInit {
 
   readonly jiraBaseUrl = environment.jiraBaseUrl;
 
+  // Form fields
   title = '';
   description = '';
   priority = 'Medium';
   issueType = 'Task';
 
+  // Project + sprint picker
+  projects: JiraProject[] = [];
+  sprints: JiraSprint[] = [];
+  selectedProjectKey = '';
+  selectedSprintId: number | null = null;
+  projectsLoading = false;
+  sprintsLoading = false;
+
+  // Ticket list
   lastTicket: JiraPocTicket | null = null;
   tickets: JiraPocTicket[] = [];
   errorMessage = '';
@@ -31,7 +43,42 @@ export class JiraPocComponent implements OnInit {
   listLoading = false;
 
   ngOnInit(): void {
+    this.loadProjects();
     this.loadTickets();
+  }
+
+  loadProjects(): void {
+    this.projectsLoading = true;
+    this.jiraPocService.getProjects().subscribe({
+      next: (projects) => {
+        this.projects = projects;
+        this.projectsLoading = false;
+        if (projects.length > 0) {
+          this.selectedProjectKey = projects[0].key;
+          this.onProjectChange();
+        }
+      },
+      error: () => {
+        this.projectsLoading = false;
+      }
+    });
+  }
+
+  onProjectChange(): void {
+    this.sprints = [];
+    this.selectedSprintId = null;
+    if (!this.selectedProjectKey) return;
+
+    this.sprintsLoading = true;
+    this.jiraPocService.getSprints(this.selectedProjectKey).subscribe({
+      next: (sprints) => {
+        this.sprints = sprints;
+        this.sprintsLoading = false;
+      },
+      error: () => {
+        this.sprintsLoading = false;
+      }
+    });
   }
 
   createTicket(): void {
@@ -42,7 +89,9 @@ export class JiraPocComponent implements OnInit {
       summary: this.title.trim(),
       description: this.description.trim() || undefined,
       priority: this.priority,
-      issueType: this.issueType
+      issueType: this.issueType,
+      projectKey: this.selectedProjectKey || undefined,
+      sprintId: this.selectedSprintId ?? undefined
     };
 
     this.jiraPocService.createIssue(body).subscribe({
@@ -62,9 +111,7 @@ export class JiraPocComponent implements OnInit {
   }
 
   refreshTicket(): void {
-    if (!this.lastTicket?.jiraKey) {
-      return;
-    }
+    if (!this.lastTicket?.jiraKey) return;
 
     this.errorMessage = '';
     this.jiraPocService.getIssueByKey(this.lastTicket.jiraKey).subscribe({
@@ -97,5 +144,9 @@ export class JiraPocComponent implements OnInit {
 
   jiraBrowseUrl(key: string): string {
     return `${this.jiraBaseUrl}/browse/${key}`;
+  }
+
+  sprintLabel(sprint: JiraSprint): string {
+    return `${sprint.name} (${sprint.state})`;
   }
 }

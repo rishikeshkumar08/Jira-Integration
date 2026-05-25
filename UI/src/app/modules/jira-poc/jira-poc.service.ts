@@ -19,12 +19,27 @@ export interface CreateJiraIssueRequest {
   description?: string;
   priority: string;
   issueType?: string;
+  projectKey?: string;
+  sprintId?: number;
+}
+
+export interface JiraProject {
+  id: string;
+  key: string;
+  name: string;
+}
+
+export interface JiraSprint {
+  id: number;
+  name: string;
+  state: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class JiraPocService {
   private readonly apiUrl = environment.apiUrl;
   private readonly issuesUrl = `${this.apiUrl}jira/issues/`;
+  private readonly projectsUrl = `${this.apiUrl}jira/projects`;
 
   private api = inject(HttpServicesService);
 
@@ -38,5 +53,13 @@ export class JiraPocService {
 
   getIssueByKey(key: string): Observable<JiraPocTicket> {
     return this.api.get(this.issuesUrl + encodeURIComponent(key)) as Observable<JiraPocTicket>;
+  }
+
+  getProjects(): Observable<JiraProject[]> {
+    return this.api.get(this.projectsUrl) as Observable<JiraProject[]>;
+  }
+
+  getSprints(projectKey: string): Observable<JiraSprint[]> {
+    return this.api.get(`${this.projectsUrl}/${encodeURIComponent(projectKey)}/sprints`) as Observable<JiraSprint[]>;
   }
 }
