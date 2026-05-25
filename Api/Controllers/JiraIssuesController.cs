@@ -27,6 +27,9 @@ public class JiraIssuesController : ControllerBase
 
         var created = await _jira.CreateIssueAsync(request, ct);
 
+        if (request.SprintId.HasValue)
+            await _jira.MoveIssueToSprintAsync(request.SprintId.Value, created.Key, ct);
+
         var ticket = _master.Upsert(
             jiraKey: created.Key,
             title: request.Summary,

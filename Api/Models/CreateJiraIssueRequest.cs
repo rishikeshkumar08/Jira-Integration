@@ -15,4 +15,10 @@ public class CreateJiraIssueRequest
 
     [JsonPropertyName("issueType")]
     public string? IssueType { get; set; }
+
+    [JsonPropertyName("projectKey")]
+    public string? ProjectKey { get; set; }
+
+    [JsonPropertyName("sprintId")]
+    public int? SprintId { get; set; }
 }
