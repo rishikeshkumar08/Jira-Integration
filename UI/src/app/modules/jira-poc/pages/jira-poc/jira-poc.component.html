@@ -35,16 +35,16 @@
     <label for="issueType">Issue type</label>
     <select id="issueType" [(ngModel)]="issueType">
       <option>Task</option>
-      <option>Story</option>
       <option>Bug</option>
+      <option>Story</option>
       <option>Epic</option>
     </select>
 
-    <label for="title">Title</label>
+    <label for="title">Title <span class="req">*</span></label>
     <input id="title" type="text" [(ngModel)]="title" placeholder="Ticket title" />
 
     <label for="description">Description</label>
-    <textarea id="description" [(ngModel)]="description" rows="4" placeholder="Description"></textarea>
+    <textarea id="description" [(ngModel)]="description" rows="4" placeholder="Description (optional)"></textarea>
 
     <label for="priority">Priority</label>
     <select id="priority" [(ngModel)]="priority">
@@ -53,7 +53,40 @@
       <option>High</option>
     </select>
 
-    <button type="button" (click)="createTicket()" [disabled]="loading || !title.trim() || !selectedProjectKey">
+    <label for="acceptanceCriteria">
+      Acceptance Criteria
+      @if (requiresCustomFields) { <span class="req">*</span> }
+    </label>
+    <textarea
+      id="acceptanceCriteria"
+      [(ngModel)]="acceptanceCriteria"
+      rows="3"
+      placeholder="Define the conditions that must be met for this ticket to be accepted">
+    </textarea>
+
+    <label for="riceScore">
+      Rice Score
+      @if (requiresCustomFields) { <span class="req">*</span> }
+    </label>
+    <input
+      id="riceScore"
+      type="number"
+      [(ngModel)]="riceScore"
+      placeholder="e.g. 42"
+      min="0" />
+
+    <label for="kanoClarification">
+      Kano Clarification
+      @if (requiresCustomFields) { <span class="req">*</span> }
+    </label>
+    <select id="kanoClarification" [(ngModel)]="kanoClarification">
+      <option value="">— Select —</option>
+      @for (option of kanoOptions; track option) {
+        <option [value]="option">{{ option }}</option>
+      }
+    </select>
+
+    <button type="button" (click)="createTicket()" [disabled]="loading || !isFormValid">
       {{ loading ? 'Creating...' : 'Create Jira ticket' }}
     </button>
 
@@ -76,7 +109,7 @@
       <p><strong>Priority:</strong> {{ lastTicket.priority }}</p>
 
       <button type="button" (click)="refreshTicket()">Refresh from Jira</button>
-      <p class="hint">Change status in Jira, then refresh (or wait for webhook).</p>
+      <p class="hint">Change status in Jira, then click Refresh (or wait for webhook).</p>
     </div>
   }
 

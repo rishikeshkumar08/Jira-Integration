@@ -21,6 +21,9 @@ export interface CreateJiraIssueRequest {
   issueType?: string;
   projectKey?: string;
   sprintId?: number;
+  acceptanceCriteria?: string;
+  riceScore?: number;
+  kanoClarification?: string;
 }
 
 export interface JiraProject {

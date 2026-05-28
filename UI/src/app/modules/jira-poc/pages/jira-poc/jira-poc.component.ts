@@ -21,11 +21,18 @@ export class JiraPocComponent implements OnInit {
 
   readonly jiraBaseUrl = environment.jiraBaseUrl;
 
-  // Form fields
+  // Core form fields
   title = '';
   description = '';
   priority = 'Medium';
   issueType = 'Task';
+
+  // Custom fields (required for Task and Bug)
+  acceptanceCriteria = '';
+  riceScore: number | null = null;
+  kanoClarification = '';
+
+  readonly kanoOptions = ['Must Have', 'Delighter'];
 
   // Project + sprint picker
   projects: JiraProject[] = [];
@@ -41,6 +48,22 @@ export class JiraPocComponent implements OnInit {
   errorMessage = '';
   loading = false;
   listLoading = false;
+
+  get requiresCustomFields(): boolean {
+    const t = this.issueType.toLowerCase();
+    return t === 'task' || t === 'bug';
+  }
+
+  get isFormValid(): boolean {
+    if (!this.title.trim()) return false;
+    if (!this.selectedProjectKey) return false;
+    if (this.requiresCustomFields) {
+      if (!this.acceptanceCriteria.trim()) return false;
+      if (this.riceScore === null || this.riceScore === undefined) return false;
+      if (!this.kanoClarification) return false;
+    }
+    return true;
+  }
 
   ngOnInit(): void {
     this.loadProjects();
@@ -91,7 +114,10 @@ export class JiraPocComponent implements OnInit {
       priority: this.priority,
       issueType: this.issueType,
       projectKey: this.selectedProjectKey || undefined,
-      sprintId: this.selectedSprintId ?? undefined
+      sprintId: this.selectedSprintId ?? undefined,
+      acceptanceCriteria: this.acceptanceCriteria.trim() || undefined,
+      riceScore: this.riceScore ?? undefined,
+      kanoClarification: this.kanoClarification || undefined
     };
 
     this.jiraPocService.createIssue(body).subscribe({
@@ -103,8 +129,8 @@ export class JiraPocComponent implements OnInit {
       error: (err) => {
         this.errorMessage =
           err?.error?.title ??
-          err?.error ??
-          'Failed to create ticket. Is API running on http://localhost:5014?';
+          (typeof err?.error === 'string' ? err.error : null) ??
+          'Failed to create ticket. Is the API running on http://localhost:5014?';
         this.loading = false;
       }
     });
