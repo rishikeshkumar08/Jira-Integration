@@ -3,6 +3,7 @@ using Api.Masters;
 using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace Api.Controllers;
 
@@ -12,11 +13,13 @@ public class JiraIssuesController : ControllerBase
 {
     private readonly JiraRestClient _jira;
     private readonly JiraPocMaster _master;
+    private readonly JiraSettings _jiraSettings;
 
-    public JiraIssuesController(JiraRestClient jira, JiraPocMaster master)
+    public JiraIssuesController(JiraRestClient jira, JiraPocMaster master, IOptions<JiraSettings> jiraOptions)
     {
         _jira = jira;
         _master = master;
+        _jiraSettings = jiraOptions.Value;
     }
 
     [HttpPost]
@@ -24,6 +27,31 @@ public class JiraIssuesController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(request.Summary))
             return BadRequest("Summary is required.");
+
+        var effectiveIssueType = string.IsNullOrWhiteSpace(request.IssueType)
+            ? _jiraSettings.DefaultIssueType
+            : request.IssueType;
+
+        var requiresCustomFields = effectiveIssueType.Equals("Task", StringComparison.OrdinalIgnoreCase)
+                                || effectiveIssueType.Equals("Bug", StringComparison.OrdinalIgnoreCase);
+
+        if (requiresCustomFields)
+        {
+            var missing = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(request.AcceptanceCriteria))
+                missing.Add("Acceptance Criteria");
+
+            if (!request.RiceScore.HasValue)
+                missing.Add("Rice Score");
+
+            if (string.IsNullOrWhiteSpace(request.KanoClarification))
+                missing.Add("Kano Clarification");
+
+            if (missing.Count > 0)
+                return UnprocessableEntity(
+                    $"The following fields are required for {effectiveIssueType}: {string.Join(", ", missing)}.");
+        }
 
         var created = await _jira.CreateIssueAsync(request, ct);
 

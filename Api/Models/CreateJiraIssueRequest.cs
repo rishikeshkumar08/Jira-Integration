@@ -21,4 +21,14 @@ public class CreateJiraIssueRequest
 
     [JsonPropertyName("sprintId")]
     public int? SprintId { get; set; }
+
+    // Custom fields — required by Jira for Task and Bug work types
+    [JsonPropertyName("acceptanceCriteria")]
+    public string? AcceptanceCriteria { get; set; }
+
+    [JsonPropertyName("riceScore")]
+    public int? RiceScore { get; set; }
+
+    [JsonPropertyName("kanoClarification")]
+    public string? KanoClarification { get; set; }
 }

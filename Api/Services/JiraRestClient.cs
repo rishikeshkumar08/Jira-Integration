@@ -64,6 +64,19 @@ public class JiraRestClient
             };
         }
 
+        // customfield_10105 — Acceptance Criteria (Paragraph / ADF)
+        if (!string.IsNullOrWhiteSpace(request.AcceptanceCriteria))
+        
+            fields["customfield_10105"] =  request.AcceptanceCriteria ;
+
+        // customfield_10106 — Rice Score (Number)
+        if (request.RiceScore.HasValue)
+            fields["customfield_10106"] = request.RiceScore.Value;
+
+        // customfield_10107 — Kano Clarification (Select List single choice)
+        if (!string.IsNullOrWhiteSpace(request.KanoClarification))
+            fields["customfield_10107"] = new { value = request.KanoClarification };
+
         var body = new { fields };
         var json = JsonSerializer.Serialize(body);
         using var content = new StringContent(json, Encoding.UTF8, "application/json");
